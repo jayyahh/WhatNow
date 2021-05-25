@@ -50,7 +50,7 @@ const City = ({navigation, route}) => {
 			<Text style={styles.question}>What city are you in?</Text>
 			<TextInput placeholder='city' style={styles.textInput} value={city} onChangeText={(t) => {setCity(t)}}>
 			</TextInput>
-			<TouchableOpacity style={styles.button}>
+			<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Explore', {activity, location})}>
 				<Text style={styles.buttonText}>Explore</Text>
 			</TouchableOpacity>
 		</View>
@@ -60,14 +60,13 @@ const City = ({navigation, route}) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center'
+		justifyContent: 'flex-start',
+		alignItems: 'center',
+		marginVertical: 250
 	},
 	question: {
 		fontSize: 35,
 		fontWeight: '200',
-		position: 'absolute',
-		top: 250
 	},
 	textInput: {
 		marginVertical: 40,

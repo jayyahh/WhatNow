@@ -20,8 +20,9 @@ const Home = ({navigation}) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center'
+		justifyContent: 'flex-start',
+		alignItems: 'center',
+		marginVertical: 250
 	},
 	options: {
 		flexDirection: 'row',
@@ -32,8 +33,6 @@ const styles = StyleSheet.create({
 	question: {
 		fontSize: 35,
 		fontWeight: '200',
-		position: 'absolute',
-		top: 250
 	},
 	button: {
 		paddingVertical: 15,

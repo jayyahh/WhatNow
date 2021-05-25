@@ -1,16 +1,16 @@
-import React from'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const Home = ({navigation}) => {
-	return(
+const Home = ({ navigation }) => {
+	return (
 		<View style={styles.container}>
 			<Text style={styles.question}>Are you looking for ...</Text>
 			<View style={styles.options} >
-				<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('City', {activity: 'food'})}>
-					<Text style={styles.buttonText}>Food</Text>
+				<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('City', { activity: 'food' })}>
+					<Text style={styles.buttonText}>food</Text>
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('City', {activity: 'fun'})}>
-					<Text style={styles.buttonText}>Fun</Text>
+				<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('City', { activity: 'fun' })}>
+					<Text style={styles.buttonText}>fun</Text>
 				</TouchableOpacity>
 			</View>
 		</View>
@@ -37,9 +37,9 @@ const styles = StyleSheet.create({
 	button: {
 		paddingVertical: 15,
 		width: 120,
-		backgroundColor:'#03a5fc',
+		backgroundColor: '#03a5fc',
 		borderRadius: 10,
-		backgroundColor:'#fff',
+		backgroundColor: '#fff',
 	},
 	buttonText: {
 		fontSize: 20,

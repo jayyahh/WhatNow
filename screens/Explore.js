@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Linking } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Linking, Modal } from 'react-native';
 
-const Explore = ({ route }) => {
+const Explore = ({ route, navigation }) => {
 	const businessesLoaded = useRef(false);
+	const usedIndex = useRef(new Set());
+	const [errorWindow, setErrorWindow] = useState(false);
 	const [activity, setActivity] = useState(route.params.activity);
 	const [city, setCity] = useState(route.params.location.city);
 	const [latitude, setLatitude] = useState(route.params.location.latitude);
@@ -19,25 +21,40 @@ const Explore = ({ route }) => {
 	const apiUrl = 'https://api.yelp.com/v3/businesses/search?limit=50&radius=30000';
 
 	const showNextAdventure = () => {
-		if (businesses.length === 0) {
-			// alert users there is NOTHING
+		if (businesses.length !== 0) {
+			// once the user has circled through all businesses
+			if (usedIndex.current.size === businesses.length) {
+				usedIndex.current.clear();
+			}
+
+			let randomIndex = Math.floor(Math.random() * businesses.length);
+			// pick an index that the user hasn't got yet
+			while (usedIndex.current.has(randomIndex)) {
+				randomIndex = Math.floor(Math.random() * businesses.length);
+			}
+
+			usedIndex.current.add(randomIndex);
+			const result = businesses[randomIndex];
+			setBusiness({
+				image: result.image_url,
+				name: result.name,
+				number: result.display_phone,
+				address: result.location.display_address,
+				details: result.url
+			});
+		} else {
+			setErrorWindow(true);
 		}
-		const randomIndex = Math.floor(Math.random() * businesses.length);
-		console.log(randomIndex);
-		const result = businesses[randomIndex];
-		setBusiness({
-			image: result.image_url,
-			name: result.name,
-			number: result.display_phone,
-			address: result.location.display_address,
-			details: result.url
-		});
 	};
 
 	const getBusinessesFromYelp = () => {
 		// fetch from yelp's API just once on load up and then store all 50 businesses, because there's a daily limit of 5000 calls.
-		let loc = `location=${city}`;
-		if (latitude !== 0 || longitude !== 0) {
+		let loc = '';
+
+		// if user has set their own location, use it. Otherwise, use location from lat and lon
+		if (route.params.location.cityFromLatLon !== city) {
+			loc = `location=${city}`;
+		} else if (latitude !== 0 || longitude !== 0) {
 			loc = `latitude=${latitude}&longitude=${longitude}`;
 		}
 
@@ -57,7 +74,7 @@ const Explore = ({ route }) => {
 		fetch(`${apiUrl}&${loc}&${categories}`, apiObj)
 			.then((res) => res.json())
 			.then((data) => {
-				setBusinesses(data.businesses);
+				setBusinesses(data.businesses ? data.businesses : []);
 				businessesLoaded.current = true;
 			}).catch((err) => console.log(err));
 	}
@@ -76,12 +93,23 @@ const Explore = ({ route }) => {
 
 	return (
 		<View style={styles.container}>
+			<Modal
+				animationType='slide'
+				transparent={true}
+				visible={errorWindow}>
+				<View style={styles.errorWindow}>
+					<Text style={styles.errorText}>Unable to find any adventure near you...</Text>
+					<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
+						<Text style={styles.buttonText}>try again</Text>
+					</TouchableOpacity>
+				</View>
+			</Modal>
 			<Image source={businessesLoaded ? { uri: `${business.image}` } : { uri: `${business.image}` }} style={styles.img} />
 			<View style={styles.info}>
 				<Text style={styles.name}>{business.name}</Text>
 				<Text style={styles.number}>{business.number}</Text>
 				<Text style={styles.address}>{business.address}</Text>
-				<Text style={styles.more} onPress={() => Linking.openURL(business.details)}>view more</Text>
+				<Text style={styles.more} onPress={() => { if (business.details) { Linking.openURL(business.details) } }}>view more</Text>
 			</View>
 			<TouchableOpacity style={styles.button} onPress={() => showNextAdventure()}>
 				<Text style={styles.buttonText}>next adventure</Text>
@@ -91,6 +119,16 @@ const Explore = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+	errorWindow: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: "white",
+	},
+	errorText: {
+		fontSize: 20,
+		textAlign: 'center'
+	},
 	container: {
 		flex: 1,
 		justifyContent: 'flex-start',

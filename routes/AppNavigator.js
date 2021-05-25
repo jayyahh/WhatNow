@@ -8,11 +8,11 @@ import Explore from '../screens/Explore';
 const Stack = createStackNavigator();
 
 export default Navigator = () => {
-	return(
+	return (
 		<NavigationContainer initialRouteName='Home'>
 			<Stack.Navigator>
 				<Stack.Screen name='Home' component={Home} options={{ title: 'Home' }} />
-        		<Stack.Screen name='City' component={City} options={{ title: 'Location' }} />
+				<Stack.Screen name='City' component={City} options={{ title: 'Location' }} />
 				<Stack.Screen name='Explore' component={Explore} options={{ title: 'Explore' }} />
 			</Stack.Navigator>
 		</NavigationContainer>

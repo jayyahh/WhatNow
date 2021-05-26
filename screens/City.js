@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, StatusBar } from 'react-native';
 import Location from 'react-native-location';
 
 const City = ({ navigation, route }) => {
@@ -50,10 +50,14 @@ const City = ({ navigation, route }) => {
 		setLocation(loc);
 	}, [city, latitude, longitude])
 
+	useEffect(() => {
+		StatusBar.setBarStyle('dark-content');
+	});
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.question}>What city are you in?</Text>
-			<TextInput placeholder='city' style={styles.textInput} value={city} onChangeText={(t) => { setCity(t) }}>
+			<TextInput placeholder='city' placeholderTextColor='#a3a3a3' value={city ? city : undefined} style={styles.textInput} onChangeText={(t) => { setCity(t) }}>
 			</TextInput>
 			<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Explore', { activity, location })}>
 				<Text style={styles.buttonText}>explore</Text>
@@ -67,7 +71,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'flex-start',
 		alignItems: 'center',
-		marginVertical: 250
+		marginTop: 250
 	},
 	question: {
 		fontSize: 35,
@@ -85,7 +89,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 15,
 		width: 120,
 		backgroundColor: '#fff',
-		borderRadius: 10
+		borderRadius: 10,
 	},
 	buttonText: {
 		fontSize: 20,

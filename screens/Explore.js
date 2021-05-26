@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Linking, Modal } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Linking, Modal, StatusBar } from 'react-native';
 
 const Explore = ({ route, navigation }) => {
 	const businessesLoaded = useRef(false);
 	const usedIndex = useRef(new Set());
+	const offset = useRef(0);
 	const [errorWindow, setErrorWindow] = useState(false);
 	const [activity, setActivity] = useState(route.params.activity);
 	const [city, setCity] = useState(route.params.location.city);
@@ -11,22 +12,22 @@ const Explore = ({ route, navigation }) => {
 	const [longitude, setLongitude] = useState(route.params.location.longitude);
 	const [businesses, setBusinesses] = useState([]);
 	const [business, setBusiness] = useState({
-		image: 'https://drive.google.com/file/d/1CVyOtmCwowhutX4vKaTMEDpmj0t1jywe/view?usp=sharing',
+		image: 'https://i.ibb.co/S6SKfxh/no-pic.jpg',
 		name: 'loading...',
 		number: 'loading...',
 		address: 'loading...',
 		details: ''
 	});
 
-	const apiUrl = 'https://api.yelp.com/v3/businesses/search?limit=50&radius=30000';
-
 	const showNextAdventure = () => {
 		if (businesses.length !== 0) {
 			// once the user has circled through all businesses
 			if (usedIndex.current.size === businesses.length) {
 				usedIndex.current.clear();
+				offset.current += businesses.length;
+				getBusinessesFromYelp();
+				return;
 			}
-
 			let randomIndex = Math.floor(Math.random() * businesses.length);
 			// pick an index that the user hasn't got yet
 			while (usedIndex.current.has(randomIndex)) {
@@ -36,7 +37,7 @@ const Explore = ({ route, navigation }) => {
 			usedIndex.current.add(randomIndex);
 			const result = businesses[randomIndex];
 			setBusiness({
-				image: result.image_url,
+				image: result.image_url ? result.image_url : 'https://i.ibb.co/S6SKfxh/no-pic.jpg',
 				name: result.name,
 				number: result.display_phone,
 				address: result.location.display_address,
@@ -49,12 +50,10 @@ const Explore = ({ route, navigation }) => {
 
 	const getBusinessesFromYelp = () => {
 		// fetch from yelp's API just once on load up and then store all 50 businesses, because there's a daily limit of 5000 calls.
-		let loc = '';
+		let loc = `location=${city}`;
 
-		// if user has set their own location, use it. Otherwise, use location from lat and lon
-		if (route.params.location.cityFromLatLon !== city) {
-			loc = `location=${city}`;
-		} else if (latitude !== 0 || longitude !== 0) {
+		// iuse location from lat and lon
+		if ((latitude !== 0 || longitude !== 0) && route.params.location.cityFromLatLon === city) {
 			loc = `latitude=${latitude}&longitude=${longitude}`;
 		}
 
@@ -71,6 +70,8 @@ const Explore = ({ route, navigation }) => {
 				'Authorization': 'Bearer bW6xY2jXwzez-CUs0vpqjjOUQW7fjPiRLpNGx109MceTxHB2eqs_GXDQnVCSv2lY-lReEyhzC7bBB-Y8pddOsKwG5VF6efYfJ9d8pJB_Ir-96tgDnVdA3o925fuTX3Yx'
 			}
 		}
+
+		const apiUrl = `https://api.yelp.com/v3/businesses/search?limit=50&radius=30000&offset=${offset.current}`;
 		fetch(`${apiUrl}&${loc}&${categories}`, apiObj)
 			.then((res) => res.json())
 			.then((data) => {
@@ -91,6 +92,10 @@ const Explore = ({ route, navigation }) => {
 		// So we need to use the busineesesLoaded ref to check if businesses have loaded
 	}, [businesses]);
 
+	useEffect(() => {
+		StatusBar.setBarStyle('dark-content');
+	});
+
 	return (
 		<View style={styles.container}>
 			<Modal
@@ -104,7 +109,7 @@ const Explore = ({ route, navigation }) => {
 					</TouchableOpacity>
 				</View>
 			</Modal>
-			<Image source={businessesLoaded ? { uri: `${business.image}` } : { uri: `${business.image}` }} style={styles.img} />
+			<Image source={{ uri: `${business.image}` }} style={styles.img} />
 			<View style={styles.info}>
 				<Text style={styles.name}>{business.name}</Text>
 				<Text style={styles.number}>{business.number}</Text>
@@ -133,7 +138,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'flex-start',
 		alignItems: 'center',
-		marginVertical: 40
+		marginTop: 40
 	},
 	img: {
 		width: 350,
@@ -175,7 +180,7 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		backgroundColor: '#fff',
 		position: 'absolute',
-		bottom: 50
+		bottom: 40
 	},
 	buttonText: {
 		fontSize: 20,

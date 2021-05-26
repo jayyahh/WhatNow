@@ -1,7 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 
 const Home = ({ navigation }) => {
+
+	useEffect(() => {
+		StatusBar.setBarStyle('dark-content');
+	});
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.question}>Are you looking for ...</Text>
@@ -22,11 +27,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'flex-start',
 		alignItems: 'center',
-		marginVertical: 250
+		marginTop: 250
 	},
 	options: {
 		flexDirection: 'row',
-		marginVertical: 40,
+		marginTop: 50,
 		width: 300,
 		justifyContent: 'space-around'
 	},

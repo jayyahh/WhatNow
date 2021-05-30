@@ -52,7 +52,7 @@ const Explore = ({ route, navigation }) => {
 		// fetch from yelp's API just once on load up and then store all 50 businesses, because there's a daily limit of 5000 calls.
 		let loc = `location=${city}`;
 
-		// iuse location from lat and lon
+		// use location from lat and lon
 		if ((latitude !== 0 || longitude !== 0) && route.params.location.cityFromLatLon === city) {
 			loc = `latitude=${latitude}&longitude=${longitude}`;
 		}
@@ -71,7 +71,20 @@ const Explore = ({ route, navigation }) => {
 			}
 		}
 
-		const apiUrl = `https://api.yelp.com/v3/businesses/search?limit=50&radius=30000&offset=${offset.current}`;
+		let sortBy = '';
+		switch (Math.floor(Math.random() * 3)) {
+			case 0:
+				sortBy = 'distance';
+				break;
+			case 1:
+				sortBy = 'rating';
+				break;
+			case 2:
+				sortBy = 'review_count';
+				break;
+		}
+
+		const apiUrl = `https://api.yelp.com/v3/businesses/search?limit=50&radius=30000&offset=${offset.current}&sort_by=${sortBy}`;
 		fetch(`${apiUrl}&${loc}&${categories}`, apiObj)
 			.then((res) => res.json())
 			.then((data) => {
@@ -112,14 +125,14 @@ const Explore = ({ route, navigation }) => {
 			<Image source={{ uri: `${business.image}` }} style={styles.img} />
 			<View style={styles.info}>
 				<Text style={styles.name}>{business.name}</Text>
-				<Text style={styles.number}>{business.number}</Text>
-				<Text style={styles.address}>{business.address}</Text>
+				<Text style={styles.number} onPress={() => Linking.openURL(`tel:${business.number}`)}>{business.number}</Text>
+				<Text style={styles.address} onPress={() => Linking.openURL(`https://maps.google.com/?q=${business.address}`)}>{business.address}</Text>
 				<Text style={styles.more} onPress={() => { if (business.details) { Linking.openURL(business.details) } }}>view more</Text>
 			</View>
 			<TouchableOpacity style={styles.button} onPress={() => showNextAdventure()}>
 				<Text style={styles.buttonText}>next adventure</Text>
 			</TouchableOpacity>
-		</View>
+		</View >
 	);
 };
 

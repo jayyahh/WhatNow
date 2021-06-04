@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Linking, Modal, StatusBar } from 'react-native';
+import { API_KEY } from '@env';
 
 const Explore = ({ route, navigation }) => {
 	const businessesLoaded = useRef(false);
@@ -67,7 +68,7 @@ const Explore = ({ route, navigation }) => {
 			headers: {
 				'Accept': 'application/json',
 				'Content-Type': 'application/json',
-				'Authorization': 'Bearer bW6xY2jXwzez-CUs0vpqjjOUQW7fjPiRLpNGx109MceTxHB2eqs_GXDQnVCSv2lY-lReEyhzC7bBB-Y8pddOsKwG5VF6efYfJ9d8pJB_Ir-96tgDnVdA3o925fuTX3Yx'
+				'Authorization': `Bearer ${API_KEY}`
 			}
 		}
 
